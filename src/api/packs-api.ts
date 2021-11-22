@@ -58,7 +58,7 @@ export type DeleteCardsPackData = {
 
 export const packsAPI = {
     getCardPacks: (payload?: GetCardPacksQueryParams) => instance
-        .get<CardsPackResponse>('cards/pack', {params: payload}),
+        .get<CardsPackResponse>('/cards/pack', {params: payload}),
 
     createCardsPack: (payload: NewCardsPackData) => instance
         .post<NewCardsPackData, AxiosResponse<CardsPack>>('/cards/pack', payload),

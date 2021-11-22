@@ -59,6 +59,11 @@ export const Login: FC = () => {
                 <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, textAlign: 'center', marginTop: 32}}>
                     <Link to={PATH.PASSWORD_RECOVERY}><h4>Forgot your password?</h4></Link>
                     <Link to={PATH.REGISTRATION}><h4>Don’t have an account? Sign Up!</h4></Link>
+                    <div style={{marginTop: 24, display: 'flex', flexDirection: 'column', gap: 16}}>
+                        <p>Or use next data to login:</p>
+                        <p>aportraitofjoyce@gmail.com</p>
+                        <p>123456789</p>
+                    </div>
                 </div>
             </form>
         </div>

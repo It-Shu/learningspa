@@ -17,7 +17,9 @@ enum PACKS_ACTIONS_TYPES {
     SET_PACKS_COUNT_ON_PAGE = 'PACKS/SET_PACKS_COUNT_ON_PAGE',
     SET_PACKS_TOTAL_COUNT = 'PACKS/SET_PACKS_TOTAL_COUNT',
     SET_MIN_MAX_CARDS_COUNT = 'PACKS/SET_MIN_MAX_CARDS_COUNT',
+    SET_CURRENT_CARDS_COUNT = 'PACKS/SET_CURRENT_CARDS_COUNT',
     SET_PRIVATE_PACKS = 'PACKS/SET_PRIVATE_PACKS',
+    SET_SORT_CARD_PACKS_METHOD = 'PACKS/SET_SORT_CARD_PACKS_METHOD'
 }
 
 export type PacksActionsTypes =
@@ -27,25 +29,34 @@ export type PacksActionsTypes =
     | ReturnType<typeof setPacksTotalCount>
     | ReturnType<typeof setMinMaxCardsCount>
     | ReturnType<typeof setPrivatePacks>
+    | ReturnType<typeof setSortCardsPackMethod>
+    | ReturnType<typeof setCurrentCardsCount>
+
 
 export type PacksInitialState = CardsPackResponse & {
     privatePacks: boolean
+    sortPacksMethod: string | undefined
+    currentCardsCount: number[]
+    countPerPage: number[]
 }
 
-const initialState: PacksInitialState = {
+export const initialState: PacksInitialState = {
     cardPacks: [],
     cardPacksTotalCount: 0,
     minCardsCount: 0,
-    maxCardsCount: 100,
+    maxCardsCount: 0,
     page: 1,
-    pageCount: 5,
+    pageCount: 10,
     privatePacks: false,
+    sortPacksMethod: undefined,
+    currentCardsCount: [0, 0],
+    countPerPage: [10, 25, 50]
 }
 
 export const packsReducer = (state = initialState, action: PacksActionsTypes): PacksInitialState => {
     switch (action.type) {
         case PACKS_ACTIONS_TYPES.SET_CARD_PACKS:
-            return {...state, cardPacks: action.payload}
+            return {...state, ...action.payload}
 
         case PACKS_ACTIONS_TYPES.SET_PACKS_CURRENT_PAGE:
             return {...state, page: action.payload.page}
@@ -62,12 +73,18 @@ export const packsReducer = (state = initialState, action: PacksActionsTypes): P
         case PACKS_ACTIONS_TYPES.SET_PRIVATE_PACKS:
             return {...state, privatePacks: action.payload.value}
 
+        case PACKS_ACTIONS_TYPES.SET_SORT_CARD_PACKS_METHOD:
+            return {...state, sortPacksMethod: action.payload.sortCardPacksMethod, page: 1}
+
+        case PACKS_ACTIONS_TYPES.SET_CURRENT_CARDS_COUNT:
+            return {...state, currentCardsCount: [...action.payload.values]}
+
         default:
             return state
     }
 }
 
-const setCardPacks = (payload: CardsPack[]) => ({
+export const setCardPacks = (payload: CardsPackResponse) => ({
     type: PACKS_ACTIONS_TYPES.SET_CARD_PACKS,
     payload
 } as const)
@@ -92,9 +109,18 @@ export const setMinMaxCardsCount = (payload: { values: number[] }) => ({
     payload
 } as const)
 
+export const setCurrentCardsCount = (payload: { values: number[] }) => ({
+    type: PACKS_ACTIONS_TYPES.SET_CURRENT_CARDS_COUNT,
+    payload
+} as const)
+
 export const setPrivatePacks = (payload: { value: boolean }) => ({
     type: PACKS_ACTIONS_TYPES.SET_PRIVATE_PACKS,
     payload
+} as const)
+
+export const setSortCardsPackMethod = (payload: { sortCardPacksMethod: string }) => ({
+    type: PACKS_ACTIONS_TYPES.SET_SORT_CARD_PACKS_METHOD, payload
 } as const)
 
 export const fetchCardPacks = (payload?: GetCardPacksQueryParams) => async (dispatch: AppDispatch, getState: () => RootState) => {
@@ -102,19 +128,17 @@ export const fetchCardPacks = (payload?: GetCardPacksQueryParams) => async (disp
     const userID = packs.privatePacks && getState().auth.userInfo?._id
     try {
         dispatch(setAppIsLoading(true))
+
         const response = await packsAPI.getCardPacks({
             page: packs.page,
             pageCount: packs.pageCount,
-            min: packs.minCardsCount,
-            max: packs.maxCardsCount,
+            min: packs.currentCardsCount[0],
+            max: packs.currentCardsCount[1],
             packName: payload?.packName || undefined,
-            user_id: userID || undefined
+            user_id: userID || undefined,
+            sortPacks: packs.sortPacksMethod
         })
-
-        dispatch(setCardPacks(response.data.cardPacks))
-        dispatch(setPacksCurrentPage({page: response.data.page}))
-        dispatch(setPacksCountOnPage({count: response.data.pageCount}))
-        dispatch(setPacksTotalCount({count: response.data.cardPacksTotalCount}))
+        dispatch(setCardPacks(response.data))
     } catch (e) {
         errorsHandler(e, dispatch)
     } finally {

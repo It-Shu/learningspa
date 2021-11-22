@@ -7,7 +7,7 @@ export type TableModel = {
 
 type TableProps = {
     model: TableModel[]
-    data: any
+    data: any[]
 }
 
 export const Table: FC<TableProps> = props => {
@@ -22,13 +22,10 @@ export const Table: FC<TableProps> = props => {
 
                 <tbody>
                 {data.map((item: any, index: number) => (
-                    <tr key={'row' + (item._id || index)}>
-                        {model.map(m => m.body(item))}
-                    </tr>
+                    <tr key={'row' + (item._id || index)}>{model.map(m => m.body(item))}</tr>
                 ))}
                 </tbody>
             </table>
         </div>
-
     )
 }

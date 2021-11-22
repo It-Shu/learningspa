@@ -20,6 +20,8 @@ beforeEach(() => {
             name: '',
             avatar: '',
             publicCardPacksCount: 0,
+            _id:'31'
+
         },
         setSuccessNewPass: false,
         sendSuccessEmail: false

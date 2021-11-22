@@ -57,12 +57,26 @@ export type UpdateCardData = {
     card: {
         _id: string
         question?: string
-        comments?: string
+        answer?: string
     }
 }
 
 export type DeleteCardData = {
     id: string
+}
+
+export type GradeData = {
+    card_id: string
+    grade: number
+}
+
+export type GradeResponse = {
+    _id: string
+    cardsPack_id: string
+    card_id: string
+    user_id: string
+    grade: number
+    shots: number
 }
 
 export const cardsAPI = {
@@ -77,4 +91,7 @@ export const cardsAPI = {
 
     updateCard: (payload: UpdateCardData) => instance
         .put<UpdateCardData, AxiosResponse<Card>>('/cards/card', payload),
+
+    grade: (payload: GradeData) => instance
+        .put<GradeData, AxiosResponse<GradeResponse>>('/cards/grade', payload)
 }

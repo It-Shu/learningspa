@@ -46,6 +46,7 @@ h1 {
 
 h2 {
     font-size: 32px;
+    margin: 24px 0;
 }
 
 h3, h4, h5 {
@@ -116,8 +117,6 @@ thead, tfoot {
 }
 
 tr {
-    display: flex;
-    align-items: center;
 }
 
 tr:hover {
@@ -125,11 +124,13 @@ tr:hover {
 }
 
 th, td {
-    flex: 1 1 20%;
     padding: 8px;
+    position: relative;
 }
 
 .tablesButtonsCell {
     display: flex;
+    justify-content: center;
+    align-items: center;
     gap: 8px;
 }
